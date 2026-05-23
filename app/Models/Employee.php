@@ -35,11 +35,11 @@ class Employee extends Model
     }
     public function department(): BelongsTo
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Department::class)->withTrashed();
     }
     public function position(): BelongsTo
     {
-        return $this->belongsTo(Position::class);
+        return $this->belongsTo(Position::class)->withTrashed();
     }
     public function attendance(): HasMany
     {

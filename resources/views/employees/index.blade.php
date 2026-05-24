@@ -91,9 +91,10 @@
                                 <div class="flex items-center gap-3">
                                     @if($employee->profile_photo)
                                         <img src="{{ asset('storage/' . $employee->profile_photo) }}"
-                                             class="w-8 h-8 rounded-full object-cover" />
+                                        width='32' height='32'     
+                                        class="w-8 h-8 rounded-full object-cover object-center flex-shrink-0" />
                                     @else
-                                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-medium">
+                                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs font-medium flex-shrink-0">
                                             {{ strtoupper(substr($employee->user->name, 0, 2)) }}
                                         </div>
                                     @endif

@@ -9,11 +9,25 @@ use Illuminate\Auth\Access\Response;
 class EmployeePolicy
 {
     /**
+     * Admins and HR managers can bypass all policy checks.
+     * This runs before every other method in this policy.
+     */
+    public function before(User $user, string $ability): ?bool
+    {
+        if ($user->hasRole('admin') || $user->hasRole('hr_manager')) {
+            return true; // grant everything, skip the methods below
+        }
+
+        return null; // fall through to the individual methods
+    }
+
+    /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole('admin') || $user->hasRole('hr_manager');
+        // return $user->hasRole('admin') || $user->hasRole('hr_manager');
+        return true; // handled by before()
     }
 
     /**
@@ -21,7 +35,8 @@ class EmployeePolicy
      */
     public function view(User $user, Employee $employee): bool
     {
-        return false;
+        // Employees can only view their own profile
+        return $user->employee?->id === $employee->id;
     }
 
     /**
@@ -29,7 +44,8 @@ class EmployeePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('admin') || $user->hasRole('hr_manager');
+        // return $user->hasRole('admin') || $user->hasRole('hr_manager');
+        return true; // handled by before()
     }
 
     /**
@@ -37,7 +53,8 @@ class EmployeePolicy
      */
     public function update(User $user, Employee $employee): bool
     {
-        return $user->hasRole('admin') || $user->hasRole('hr_manager');
+        // return $user->hasRole('admin') || $user->hasRole('hr_manager');
+        return true; // handled by before()
     }
 
     /**
@@ -45,7 +62,8 @@ class EmployeePolicy
      */
     public function delete(User $user): bool
     {
-        return $user->hasRole('admin');
+        // return $user->hasRole('admin');
+        return true; // handled by before()
     }
 
     /**

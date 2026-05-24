@@ -72,7 +72,9 @@ class EmployeeController extends Controller
 
     public function show(Employee $employee): View
     {
-        $this->authorize('view', $employee);
+        // // Removed this line because the before() in EmployeePolicy grants admin+hr_manager automatically.
+        // // Employees use the separate profile() method via /my-profile route.
+        // $this->authorize('view', $employee);
 
         $employee->load(['user', 'department', 'position', 'attendance', 'leaveRequests', 'payrolls']);
 

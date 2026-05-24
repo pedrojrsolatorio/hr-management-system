@@ -15,11 +15,23 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // // bulk creation
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // // single creation
+        // User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@example.com',
+        // ]);
+
+        $this->call([
+            RoleSeeder::class,
+            DepartmentSeeder::class,
+            PositionSeeder::class,
+            LeaveTypeSeeder::class,
+            AdminUserSeeder::class,
+            HrManagerSeeder::class,
+            EmployeeSeeder::class,
         ]);
     }
 }

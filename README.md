@@ -40,18 +40,18 @@ A full-featured Human Resource Management System built with Laravel 11, Blade, T
 
 ## Tech stack
 
-| Layer | Technology |
-|---|---|
-| Backend | Laravel 11 |
-| Frontend | Blade + TailwindCSS |
-| Database | MySQL 8+ |
-| Authentication | Laravel Breeze |
-| Authorization | Policies + Role middleware |
-| API auth | Laravel Sanctum |
-| PDF generation | barryvdh/laravel-dompdf |
-| Excel export | Maatwebsite/Laravel-Excel |
-| Charts | Chart.js |
-| PHP | 8.2+ |
+| Layer          | Technology                 |
+| -------------- | -------------------------- |
+| Backend        | Laravel 11                 |
+| Frontend       | Blade + TailwindCSS        |
+| Database       | MySQL 8+                   |
+| Authentication | Laravel Breeze             |
+| Authorization  | Policies + Role middleware |
+| API auth       | Laravel Sanctum            |
+| PDF generation | barryvdh/laravel-dompdf    |
+| Excel export   | Maatwebsite/Laravel-Excel  |
+| Charts         | Chart.js                   |
+| PHP            | 8.2+                       |
 
 ---
 
@@ -148,12 +148,12 @@ Visit `http://localhost:8000` in your browser.
 
 ## Default credentials
 
-| Role | Email | Password |
-|---|---|---|
-| Admin | admin@hrms.com | password |
-| HR Manager | hr@hrms.com | password |
-| Employee | emp1@hrms.com | password |
-| Employee | emp2@hrms.com | password |
+| Role       | Email          | Password |
+| ---------- | -------------- | -------- |
+| Admin      | admin@hrms.com | password |
+| HR Manager | hr@hrms.com    | password |
+| Employee   | emp1@hrms.com  | password |
+| Employee   | emp2@hrms.com  | password |
 
 > **Note:** Change all passwords immediately before deploying to production.
 
@@ -162,6 +162,7 @@ Visit `http://localhost:8000` in your browser.
 ## Roles and permissions
 
 ### Admin
+
 - Full system access
 - Manage departments, positions, and all employees
 - Generate, approve, and mark payroll as paid
@@ -170,6 +171,7 @@ Visit `http://localhost:8000` in your browser.
 - Access REST API
 
 ### HR Manager
+
 - Manage employee profiles (create, update, terminate)
 - View and filter attendance records
 - Approve or reject leave requests
@@ -177,6 +179,7 @@ Visit `http://localhost:8000` in your browser.
 - Export reports as PDF or Excel
 
 ### Employee
+
 - View own profile
 - Daily check-in and check-out
 - Submit leave requests and view balance
@@ -189,33 +192,43 @@ Visit `http://localhost:8000` in your browser.
 ## Module overview
 
 ### Dashboard
+
 Real-time metrics showing total active employees, present today, on leave today, and pending leave requests. Three Chart.js charts: monthly attendance bar chart, department distribution doughnut, and 6-month payroll cost line chart.
 
 ### Employee management
+
 Full CRUD with profile photo upload, department and position assignment, hire date, salary, gender, and contact details. Soft-delete termination preserves all historical records. Admin can restore or permanently delete terminated employees.
 
 ### Department management
+
 Create and manage departments with optional manager assignment. Department detail page shows all assigned employees.
 
 ### Position management
+
 Create positions with level classification (junior, mid, senior, lead, manager, executive). Position detail page shows all employees in that role.
 
 ### Attendance tracking
+
 Employees check in and check out via the web interface. The system detects late arrivals (after 09:00). HR managers view all records filterable by employee and date. Monthly report shows present, late, and absent counts per employee.
 
 ### Leave management
+
 Configurable leave types (annual, sick, unpaid, maternity) with allowed days per year. Employees submit requests with date range and reason. The system validates the remaining balance before submission. HR managers approve or reject with an optional rejection reason. Both parties receive database notifications on status change.
 
 ### Payroll system
+
 Admin generates payroll per employee or for all active employees for a given month. The system calculates basic salary, housing allowance (20%), transport allowance (10%), income tax (10%), social security (5%), and absence deductions based on actual attendance. PDF payslips are generated on demand with DomPDF.
 
 ### Performance reviews
+
 HR managers submit scored reviews (1–100) per employee per period (e.g. Q1-2024) with strengths, improvement areas, and comments. Employees receive a notification when a review is submitted.
 
 ### Reports
+
 Three report types: employee list, payroll summary by month, and attendance records by month. Each report can be viewed in the browser, exported as PDF, or downloaded as an Excel file.
 
 ### Notifications
+
 All in-app notifications use Laravel's database channel. HR managers are notified when an employee submits a leave request. Employees are notified when their leave is approved or rejected, and when a performance review is submitted for them.
 
 ---
@@ -399,12 +412,6 @@ Then add `'mail'` to the `via()` array in each notification class.
 - **Document management** — contract versioning, digital signatures, and automated renewal reminders
 - **Multi-company support** — tenant isolation for managing multiple companies from a single installation
 - **Two-factor authentication** — TOTP-based 2FA for admin and HR manager accounts
-
----
-
-## License
-
-This project is open-sourced under the [MIT license](LICENSE).
 
 ---
 

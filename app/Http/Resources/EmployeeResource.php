@@ -23,8 +23,8 @@ class EmployeeResource extends JsonResource
             'department'     => $this->department?->name,
             'position'       => $this->position?->title,
             'hire_date'      => $this->hire_date->format('Y-m-d'),
-            'basic_salary'   => (float) $this->basic_salary,
-            // 'basic_salary'  => $this->basic_salary,
+            // 'basic_salary'   => (float) $this->basic_salary,
+            'basic_salary'  => $this->basic_salary,
             'status'         => $this->status,
             'profile_photo'  => $this->profile_photo
                 ? asset('storage/' . $this->profile_photo)

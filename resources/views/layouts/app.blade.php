@@ -8,17 +8,35 @@
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans">
 
-<div class="flex min-h-screen">
+<div
+     x-data="{ open: localStorage.getItem('sidebar') !== 'hidden' }"
+    x-init="$watch('open', value => localStorage.setItem('sidebar', value ? 'shown' : 'hidden'))"
+    class="flex min-h-screen">
 
     {{-- Sidebar --}}
-    <aside class="w-64 bg-white border-r border-gray-100 flex flex-col">
-        <div class="px-6 py-5 border-b border-gray-100">
-            <span class="text-lg font-semibold text-indigo-600">HRMS</span>
+    <aside 
+        :class="open ? 'w-64' : 'w-20'" 
+        class="w-64 bg-white border-r border-gray-100 flex flex-col">
+        
+        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+            <span class="text-lg font-bold text-indigo-600" x-show="open" x-cloak>
+                HRMS
+            </span>
+
+            <button 
+                @click="open = !open"
+                class="text-gray-500 hover:text-indigo-600 transition"
+                title="Toggle Sidebar"
+            >
+                ☰
+            </button>
         </div>
+
         <nav class="flex-1 px-4 py-6 space-y-1 text-sm">
             <a href="{{ route('dashboard') }}"
                class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('dashboard') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
-                Dashboard
+                <span>🏠</span>
+                <span x-show="open" x-cloak>Dashboard</span>
             </a>
 
             @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('hr_manager'))

@@ -5,20 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ config('app.name', 'HRMS') }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        [x-cloak] {display: none !important}
+    </style>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans">
 
 <div
-     x-data="{ open: localStorage.getItem('sidebar') !== 'hidden' }"
+    x-data="{ open: localStorage.getItem('sidebar') !== 'hidden' }"
     x-init="$watch('open', value => localStorage.setItem('sidebar', value ? 'shown' : 'hidden'))"
     class="flex min-h-screen">
 
     {{-- Sidebar --}}
     <aside 
         :class="open ? 'w-64' : 'w-20'" 
-        class="w-64 bg-white border-r border-gray-100 flex flex-col">
+        class="bg-white border-r border-gray-100 flex flex-col transition-all duration-300 ease-in-out">
         
-        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+        <div class="px-4 py-5 border-b border-gray-100 flex items-center justify-between">
             <span class="text-lg font-bold text-indigo-600" x-show="open" x-cloak>
                 HRMS
             </span>
@@ -32,74 +36,87 @@
             </button>
         </div>
 
-        <nav class="flex-1 px-4 py-6 space-y-1 text-sm">
+        <nav class="flex-1 px-2 py-6 space-y-1 text-sm">
+
+            @php
+                $linkClass = "flex items-center gap-3 px-3 py-2 rounded-lg transition duration-150 ease-in-out hover:translate-x-0.5 hover:bg-indigo-50";
+
+                $activeClass = "text-indigo-700 font-medium";
+                $inactiveClass = "text-gray-600";
+
+                $isActive = fn($pattern) => request()->routeIs($pattern);
+            @endphp
+
             <a href="{{ route('dashboard') }}"
-               class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('dashboard') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
+               class="{{ $linkClass }} {{ $isActive('dashboard') ? $activeClass : $inactiveClass }}">
                 <span>🏠</span>
                 <span x-show="open" x-cloak>Dashboard</span>
             </a>
 
             @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('hr_manager'))
-            <a href="{{ route('employees.index') }}"
-               class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('employees.*') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
-                Employees
-            </a>
-            <a href="{{ route('departments.index') }}"
-               class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('departments.*') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
-                Departments
-            </a>
-            <a href="{{ route('positions.index') }}"
-               class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('positions.*') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
-                Positions
-            </a>
-            <a href="{{ route('attendance.index') }}"
-               class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('attendance.index') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
-                Attendance
-            </a>
-            <a href="{{ route('leaves.index') }}"
-               class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('leaves.index') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
-                Leave Requests
-            </a>
-            <a href="{{ route('performance-reviews.index') }}"
-               class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('performance-reviews.*') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
-                Performance
-            </a>
-            <a href="{{ route('reports.index') }}"
-               class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('reports.*') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
-                Reports
-            </a>
+                {{-- <a href="{{ route('employees.index') }}"
+                class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('employees.*') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
+                    Employees
+                </a> --}}
+                 <a href="{{ route('employees.index') }}" class="{{ $linkClass }} {{ $isActive('employees.index') ? $activeClass : $inactiveClass }}">
+                    <span>👥</span><span x-show="open" x-cloak>Employees</span>
+                </a>
+                <a href="{{ route('departments.index') }}"
+                class="{{ $linkClass }} {{ $isActive('departments.*') ? $activeClass : $inactiveClass }}">
+                    <span>🏢</span><span x-show="open" x-cloak>Departments</span>
+                </a>
+                <a href="{{ route('positions.index') }}"
+                class="{{ $linkClass }} {{ $isActive('positions.*') ? $activeClass : $inactiveClass }}">
+                    <span>📌</span><span x-show="open" x-cloak>Positions</span>
+                </a>
+                <a href="{{ route('attendance.index') }}"
+                class="{{ $linkClass }} {{ $isActive('attendance.index') ? $activeClass : $inactiveClass }}">
+                    <span>⏱️</span><span x-show="open" x-cloak>Attendance</span>
+                </a>
+                <a href="{{ route('leaves.index') }}"
+                class="{{ $linkClass }} {{ $isActive('leaves.index') ? $activeClass : $inactiveClass }}">
+                    <span>🏖️</span><span x-show="open" x-cloak>Leave Requests</span>
+                </a>
+                <a href="{{ route('performance-reviews.index') }}"
+                class="{{ $linkClass }} {{ $isActive('performance-reviews.*') ? $activeClass : $inactiveClass }}">
+                    <span>📊</span><span x-show="open" x-cloak>Performance</span>
+                </a>
+                <a href="{{ route('reports.index') }}"
+                class="{{ $linkClass }} {{ $isActive('reports.*') ? $activeClass : $inactiveClass }}">
+                    <span>📁</span><span x-show="open" x-cloak>Reports</span>
+                </a>
             @endif
 
             @if(auth()->user()->hasRole('admin'))
             <a href="{{ route('payroll.index') }}"
-               class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('payroll.*') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
-                Payroll
+               class="{{ $linkClass }} {{ $isActive('payroll.*') ? $activeClass : $inactiveClass }}">
+                <span>💰</span><span x-show="open" x-cloak>Payroll</span>
             </a>
             @endif
 
             @if(auth()->user()->hasRole('employee'))
             <a href="{{ route('employee.profile') }}"
-               class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('employee.profile') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
-                My Profile
+               class="{{ $linkClass }} {{ $isActive('employee.profile') ? $activeClass : $inactiveClass }}">
+                <span>🙍</span><span x-show="open" x-cloak>My Profile</span>
             </a>
             <a href="{{ route('attendance.my') }}"
-               class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('attendance.my') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
-                My Attendance
+               class="{{ $linkClass }} {{ $isActive('attendance.my') ? $activeClass : $inactiveClass }}">
+                <span>⏱️</span><span x-show="open" x-cloak>My Attendance</span>
             </a>
             <a href="{{ route('leaves.my') }}"
-               class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('leaves.my') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
-                My Leaves
+               class="{{ $linkClass }} {{ $isActive('leaves.my') ? $activeClass : $inactiveClass }}">
+                <span>🏖️</span><span x-show="open" x-cloak>My Leaves</span>
             </a>
             <a href="{{ route('payroll.my') }}"
-               class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('payroll.my') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
-                My Payslips
+               class="{{ $linkClass }} {{ $isActive('payroll.my') ? $activeClass : $inactiveClass }}">
+                <span>💵</span><span x-show="open" x-cloak>My Payslips</span>
             </a>
             @endif
         </nav>
 
         {{-- User info + logout --}}
         <div class="px-4 py-4 border-t border-gray-100">
-            <p class="text-xs text-gray-500 truncate">{{ auth()->user()->name }}</p>
+            <p class="text-xs text-gray-500 truncate" x-show="open" x-cloak>{{ auth()->user()->name }}</p>
             <form method="POST" action="{{ route('logout') }}" class="mt-1">
                 @csrf
                 <button type="submit" class="text-xs text-red-500 hover:underline">Sign out</button>

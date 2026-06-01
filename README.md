@@ -18,7 +18,6 @@ A full-featured Human Resource Management System built with Laravel 11, Blade, T
 - [Configuration](#configuration)
 - [Screenshots](#screenshots)
 - [Future improvements](#future-improvements)
-- [License](#license)
 
 ---
 

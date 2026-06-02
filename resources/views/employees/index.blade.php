@@ -88,7 +88,7 @@
                     @forelse($employees as $employee)
                         <tr class="hover:bg-gray-50 {{ $employee->trashed() ? 'opacity-60' : '' }}">
                             <td class="px-6 py-3">
-                                <div class="flex items-center gap-3">
+                                <a href="{{ route('employees.show', $employee) }}" class="flex items-center gap-3">
                                     @if($employee->profile_photo)
                                         <img src="{{ asset('storage/' . $employee->profile_photo) }}"
                                         width='32' height='32'     
@@ -99,7 +99,7 @@
                                         </div>
                                     @endif
                                     <span class="font-medium text-gray-800">{{ $employee->user->name }}</span>
-                                </div>
+                                </a>
                             </td>
                             <td class="px-6 py-3 text-gray-500">{{ $employee->employee_code }}</td>
                             <td class="px-6 py-3 text-gray-600">{{ $employee->department?->name ?? '—' }}</td>

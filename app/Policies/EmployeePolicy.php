@@ -27,7 +27,7 @@ class EmployeePolicy
     public function viewAny(User $user): bool
     {
         // return $user->hasRole('admin') || $user->hasRole('hr_manager');
-        return true; // handled by before()
+        return true; // handled by before() or restrict later if needed
     }
 
     /**
@@ -45,7 +45,8 @@ class EmployeePolicy
     public function create(User $user): bool
     {
         // return $user->hasRole('admin') || $user->hasRole('hr_manager');
-        return true; // handled by before()
+        // return true; // handled by before()
+        return false; // only admin/hr via before()
     }
 
     /**
@@ -54,7 +55,8 @@ class EmployeePolicy
     public function update(User $user, Employee $employee): bool
     {
         // return $user->hasRole('admin') || $user->hasRole('hr_manager');
-        return true; // handled by before()
+        // return true; // handled by before()
+        return $user->employee?->id === $employee->id; // Employee can update their own profile only, except admin
     }
 
     /**
@@ -63,7 +65,8 @@ class EmployeePolicy
     public function delete(User $user): bool
     {
         // return $user->hasRole('admin');
-        return true; // handled by before()
+        // return true; // handled by before()
+        return false; // only admin via before()
     }
 
     /**

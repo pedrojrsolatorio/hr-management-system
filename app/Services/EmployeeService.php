@@ -8,11 +8,64 @@ use Illuminate\Support\Str;
 
 class EmployeeService
 {
+    // public function create(array $data): Employee
+    // {
+    //     $employee = null;
+
+    //     DB::transaction(function () use ($data, &$employee) {
+    //         $user = User::create([
+    //             'name'     => $data['name'],
+    //             'email'    => $data['email'],
+    //             'password' => Hash::make($data['password'] ?? Str::random(10)),
+    //         ]);
+
+    //         $empRole = Role::where('slug', 'employee')->first();
+    //         if ($empRole) {
+    //             $user->roles()->attach($empRole->id);
+    //         }
+
+    //         $photoPath = null;
+    //         if (!empty($data['profile_photo']) && is_object($data['profile_photo'])) {
+    //             $photoPath = $data['profile_photo']->store('employees', 'public');
+    //         }
+
+    //         $employee = Employee::create([
+    //             'user_id'       => $user->id,
+    //             'department_id' => $data['department_id'] ?? null,
+    //             'position_id'   => $data['position_id'] ?? null,
+    //             'phone'         => $data['phone'] ?? null,
+    //             'address'       => $data['address'] ?? null,
+    //             'date_of_birth' => $data['date_of_birth'] ?? null,
+    //             'hire_date'     => $data['hire_date'],
+    //             'basic_salary'  => $data['basic_salary'],
+    //             'status'        => $data['status'] ?? 'active',
+    //             'gender'        => $data['gender'] ?? null,
+    //             'profile_photo' => $photoPath,
+    //             'employee_code' => $this->generateCode(),
+    //         ]);
+
+    //         AuditLog::create([
+    //             'user_id'    => auth()->id(),
+    //             'action'     => 'employee.created',
+    //             'model_type' => Employee::class,
+    //             'model_id'   => $employee->id,
+    //             'new_values' => $employee->toArray(),
+    //             'ip_address' => request()->ip(),
+    //         ]);
+    //     });
+
+    //     // This tells the IDE $employee is guaranteed Employee after the transaction
+    //     assert($employee instanceof Employee);
+
+    //     // $employee is set inside the transaction via reference
+    //     return $employee;
+    // }
+
+    // // Better version without reference variable and assert
     public function create(array $data): Employee
     {
-        $employee = null;
+        return DB::transaction(function () use ($data) {
 
-        DB::transaction(function () use ($data, &$employee) {
             $user = User::create([
                 'name'     => $data['name'],
                 'email'    => $data['email'],
@@ -25,8 +78,9 @@ class EmployeeService
             }
 
             $photoPath = null;
+
             if (!empty($data['profile_photo']) && is_object($data['profile_photo'])) {
-                $photoPath = $data['profile_photo']->store('employees', 'public');
+                $photoPath = $data['profile_photo']->store('employees', 'public'); // or 's3'
             }
 
             $employee = Employee::create([
@@ -52,13 +106,9 @@ class EmployeeService
                 'new_values' => $employee->toArray(),
                 'ip_address' => request()->ip(),
             ]);
+
+            return $employee;
         });
-
-        // This tells the IDE $employee is guaranteed Employee after the transaction
-        assert($employee instanceof Employee);
-
-        // $employee is set inside the transaction via reference
-        return $employee;
     }
 
     public function update(Employee $employee, array $data): Employee

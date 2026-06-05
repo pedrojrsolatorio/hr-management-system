@@ -95,8 +95,11 @@ class EmployeeService
                 'status'        => $data['status'] ?? 'active',
                 'gender'        => $data['gender'] ?? null,
                 'profile_photo' => $photoPath,
-                'employee_code' => $this->generateCode(),
+                // 'employee_code' => $this->generateCode(),
             ]);
+
+            $employee->employee_code = sprintf('EMP-%04d', $employee->id);
+            $employee->save();
 
             AuditLog::create([
                 'user_id'    => auth()->id(),
@@ -224,9 +227,10 @@ class EmployeeService
         return $employee;
     }
 
-    private function generateCode(): string
-    {
-        $last = Employee::withTrashed()->latest('id')->value('id') ?? 0;
-        return 'EMP-' . str_pad($last + 1, 4, '0', STR_PAD_LEFT);
-    }
+    // // Could create duplicate employee_code if two employee are created at the same time
+    // private function generateCode(): string
+    // {
+    //     $last = Employee::withTrashed()->latest('id')->value('id') ?? 0;
+    //     return 'EMP-' . str_pad($last + 1, 4, '0', STR_PAD_LEFT);
+    // }
 }

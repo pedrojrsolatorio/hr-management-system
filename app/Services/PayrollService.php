@@ -94,3 +94,5 @@ class PayrollService
         return $days;
     }
 }
+
+// Note: using float for salary calculations is generally not recommended due to precision issues. In production, consider using a library like Brick\Money or storing amounts as integers (cents) to avoid rounding errors.

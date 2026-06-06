@@ -52,7 +52,7 @@ class PayrollController extends Controller
         return view('payroll.show', compact('payroll'));
     }
 
-    public function pdf(Payroll $payroll): \Illuminate\Http\Response
+    public function pdf(Payroll $payroll): Response
     {
         $payroll->load(['employee.user', 'employee.department', 'employee.position', 'items']);
 

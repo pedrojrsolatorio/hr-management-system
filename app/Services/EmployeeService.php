@@ -98,6 +98,7 @@ class EmployeeService
                 // 'employee_code' => $this->generateCode(),
             ]);
 
+            // replaced the generateCode()
             $employee->employee_code = sprintf('EMP-%04d', $employee->id);
             $employee->save();
 

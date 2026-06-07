@@ -69,7 +69,8 @@ class EmployeeService
             $user = User::create([
                 'name'     => $data['name'],
                 'email'    => $data['email'],
-                'password' => Hash::make($data['password'] ?? Str::random(10)),
+                // 'password' => Hash::make($data['password'] ?? Str::random(10)),
+                'password' => Hash::make('password'), // use this instead of random password since there's no password input in view
             ]);
 
             $empRole = Role::where('slug', 'employee')->first();

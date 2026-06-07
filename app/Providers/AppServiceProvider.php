@@ -22,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::policy(Employee::class, EmployeePolicy::class);
+        // // Commented because Laravel can automatically discover policies if you follow the naming convention
+        // Gate::policy(Employee::class, EmployeePolicy::class);
     }
 }

@@ -15,7 +15,13 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
+        <div class="bg-layer">
+            <div class="bg-grid"></div>
+            <div class="bg-orb-1"></div>
+            <div class="bg-orb-2"></div>
+            <div class="bg-orb-3"></div>
+        </div>
+        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0">
             <div>
                 <a href="{{ route('welcome') }}">
                     <x-application-logo class="w-20 h-20 fill-current text-gray-500" />

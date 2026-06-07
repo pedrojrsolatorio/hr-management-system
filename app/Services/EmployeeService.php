@@ -96,11 +96,13 @@ class EmployeeService
                 'gender'        => $data['gender'] ?? null,
                 'profile_photo' => $photoPath,
                 // 'employee_code' => $this->generateCode(),
+                'employee_code' => Str::uuid(),
             ]);
 
             // replaced the generateCode()
-            $employee->employee_code = sprintf('EMP-%04d', $employee->id);
-            $employee->save();
+            $employee->update([
+                'employee_code' => sprintf('EMP-%04d', $employee->id),
+            ]);
 
             AuditLog::create([
                 'user_id'    => auth()->id(),

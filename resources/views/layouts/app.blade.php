@@ -16,7 +16,7 @@
         [x-cloak] {display: none !important}
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans">
+<body class="bg-gray-50 text-gray-900 font-sans antialiased">
 
     <div
         x-data="{ open: localStorage.getItem('sidebar') !== 'hidden' }"
@@ -55,13 +55,12 @@
                     $isActive = fn($pattern) => request()->routeIs($pattern);
                 @endphp
 
-                <a href="{{ route('dashboard') }}"
-                class="{{ $linkClass }} {{ $isActive('dashboard') ? $activeClass : $inactiveClass }}">
-                    <span>🏠</span>
-                    <span x-show="open" x-cloak>Dashboard</span>
-                </a>
-
                 @if(auth()->user()->hasRole('admin') || auth()->user()->hasRole('hr_manager'))
+                    <a href="{{ route('dashboard') }}"
+                    class="{{ $linkClass }} {{ $isActive('dashboard') ? $activeClass : $inactiveClass }}">
+                        <span>🏠</span>
+                        <span x-show="open" x-cloak>Dashboard</span>
+                    </a>
                     {{-- <a href="{{ route('employees.index') }}"
                     class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-indigo-50 hover:text-indigo-700 {{ request()->routeIs('employees.*') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }}">
                         Employees
@@ -103,10 +102,6 @@
                 @endif
 
                 @if(auth()->user()->hasRole('employee'))
-                <a href="{{ route('employee.profile') }}"
-                class="{{ $linkClass }} {{ $isActive('employee.profile') ? $activeClass : $inactiveClass }}">
-                    <span>🙍</span><span x-show="open" x-cloak>My Profile</span>
-                </a>
                 <a href="{{ route('attendance.my') }}"
                 class="{{ $linkClass }} {{ $isActive('attendance.my') ? $activeClass : $inactiveClass }}">
                     <span>⏱️</span><span x-show="open" x-cloak>My Attendance</span>
@@ -118,6 +113,10 @@
                 <a href="{{ route('payroll.my') }}"
                 class="{{ $linkClass }} {{ $isActive('payroll.my') ? $activeClass : $inactiveClass }}">
                     <span>💵</span><span x-show="open" x-cloak>My Payslips</span>
+                </a>
+                <a href="{{ route('employee.profile') }}"
+                class="{{ $linkClass }} {{ $isActive('employee.profile') ? $activeClass : $inactiveClass }}">
+                    <span>🙍</span><span x-show="open" x-cloak>My Profile</span>
                 </a>
                 @endif
             </nav>

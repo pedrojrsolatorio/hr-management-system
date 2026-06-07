@@ -42,9 +42,10 @@ Route::get('/', function () {
 | Dashboard
 |-------------------------
 */
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+// // transfered to 'role:admin,hr_manager' group
+// Route::get('/dashboard', [DashboardController::class, 'index'])
+//     ->middleware(['auth', 'verified'])
+//     ->name('dashboard');
 
 /*
 |-------------------------
@@ -77,6 +78,10 @@ Route::middleware('auth')->group(function () {
 
     // Admin + HR Manager
     Route::middleware(['role:admin,hr_manager'])->group(function () {
+
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->middleware('verified')
+            ->name('dashboard');
 
         Route::resource('employees', EmployeeController::class);
         Route::resource('departments', DepartmentController::class);

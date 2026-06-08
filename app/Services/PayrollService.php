@@ -16,26 +16,41 @@ class PayrollService
 
         return DB::transaction(function () use ($employee, $month) {
             $basic       = (float) $employee->basic_salary;
-            $workingDays = $this->workingDaysInMonth($month);
 
             // Use whereBetween instead of whereRaw to avoid argument count issues
-            $start = Carbon::parse("{$month}-01")->startOfMonth();
-            $end   = Carbon::parse("{$month}-01")->endOfMonth();
+            $start = Carbon::parse("{$month}-01")->startOfMonth()->toDateString();
+            $end   = Carbon::parse("{$month}-01")->endOfMonth()->toDateString();
 
             $presentDays = Attendance::where('employee_id', $employee->id)
-                ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+                ->whereBetween('date', [$start, $end])
                 ->whereIn('status', ['present', 'late'])
                 ->count();
 
+            $halfDays = Attendance::where('employee_id', $employee->id)
+                ->whereBetween('date', [$start, $end])
+                ->where('status', 'half-day')
+                ->count();
+
+            // Convert to effective working days
+            $effectiveDaysWorked = $presentDays + ($halfDays * 0.5);
+
+            $workingDays = $this->workingDaysInMonth($month);
+
             $absenceDeduction = $workingDays > 0
-                ? ($basic / $workingDays) * max(0, $workingDays - $presentDays)
+                ? ($basic / $workingDays) * max(0, $workingDays - $effectiveDaysWorked)
                 : 0;
 
+            // ========================
+            // Allowances
+            // ========================
             $allowances = [
                 ['label' => 'Housing Allowance',   'amount' => round($basic * 0.20, 2)],
                 ['label' => 'Transport Allowance', 'amount' => round($basic * 0.10, 2)],
             ];
 
+            // ========================
+            // Deductions
+            // ========================
             $deductions = [
                 ['label' => 'Income Tax (10%)',     'amount' => round($basic * 0.10, 2)],
                 ['label' => 'Social Security (5%)', 'amount' => round($basic * 0.05, 2)],
@@ -47,6 +62,9 @@ class PayrollService
             $gross           = $basic + $totalAllowances;
             $net             = max(0, $gross - $totalDeductions);
 
+            // ========================
+            // Create Payroll
+            // ========================
             $payroll = Payroll::create([
                 'employee_id'      => $employee->id,
                 'month'            => $month,
@@ -57,6 +75,9 @@ class PayrollService
                 'status'           => 'draft',
             ]);
 
+            // ========================
+            // Payroll Items
+            // ========================
             foreach ($allowances as $a) {
                 $payroll->items()->create([...$a, 'type' => 'allowance']);
             }

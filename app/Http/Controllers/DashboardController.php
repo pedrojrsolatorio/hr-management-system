@@ -35,6 +35,10 @@ class DashboardController extends Controller
                 'month'   => $month->format('M Y'),
                 'present' => Attendance::whereBetween('date', [$start, $end])
                     ->where('status', 'present')->count(),
+                'late'    => Attendance::whereBetween('date', [$start, $end])
+                    ->where('status', 'late')->count(),
+                'half_day' => Attendance::whereBetween('date', [$start, $end])
+                    ->where('status', 'half-day')->count(),
                 'absent'  => Attendance::whereBetween('date', [$start, $end])
                     ->where('status', 'absent')->count(),
             ];

@@ -93,9 +93,23 @@ class AttendanceController extends Controller
             return back()->with('error', 'You have already checked out today.');
         }
 
-        $attendance->update(['check_out' => now()->format('H:i:s')]);
+        $checkout = now();
 
-        return back()->with('success', 'Checked out at ' . now()->format('H:i'));
+        // Detect half-day: checked out before 13:00
+        $halfDayThreshold = Carbon::today()->setTime(13, 0);
+        if ($checkout->lessThan($halfDayThreshold)) {
+            $attendance->update([
+                'check_out' => $checkout->format('H:i:s'),
+                'status' => 'half-day',
+            ]);
+        } else {
+            $attendance->update([
+                'check_out' => $checkout->format('H:i:s'),
+                // Keep existing status (present or late) — don't overwrite
+            ]);
+        }
+
+        return back()->with('success', 'Checked out at ' . $checkout->format('H:i'));
     }
 
     public function report(Request $request): View
@@ -122,6 +136,7 @@ class AttendanceController extends Controller
                 'code'     => $employee->employee_code,
                 'present'  => $att->where('status', 'present')->count(),
                 'late'     => $att->where('status', 'late')->count(),
+                'half_day' => $att->where('status', 'half-day')->count(),
                 'absent'   => $att->where('status', 'absent')->count(),
                 'total'    => $att->count(),
             ];

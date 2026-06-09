@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,9 +11,10 @@
     {{-- Use Bunny instead of Google Fonts for privacy --}}
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=dm-sans:300,400,500|syne:400,500,600,700,800" rel="stylesheet">
-    
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body>
 
     <!-- Background -->
@@ -37,8 +39,9 @@
                 @auth
                     <a href="{{ route('dashboard') }}" class="btn-nav">Go to Dashboard →</a>
                 @else
-                    <a href="{{ route('login') }}" class="nav-link">Sign in</a>
-                    <a href="{{ route('login') }}" class="btn-nav">Get started →</a>
+                    {{-- <a href="{{ route('login') }}" class="nav-link">Sign in</a> --}}
+                    {{-- <a href="{{ route('register') }}" class="btn-nav">Get started →</a> --}}
+                    <a href="{{ route('login') }}" class="btn-nav">Sign in →</a>
                 @endauth
             </div>
         </nav>
@@ -266,4 +269,5 @@
     </div>
 
 </body>
+
 </html>

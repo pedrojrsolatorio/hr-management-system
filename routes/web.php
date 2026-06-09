@@ -42,7 +42,7 @@ Route::get('/', function () {
 | Dashboard
 |-------------------------
 */
-// // transfered to 'role:admin,hr_manager' group
+// // Transfered to 'role:admin,hr_manager' group
 // Route::get('/dashboard', [DashboardController::class, 'index'])
 //     ->middleware(['auth', 'verified'])
 //     ->name('dashboard');

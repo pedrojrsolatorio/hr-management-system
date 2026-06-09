@@ -16,10 +16,11 @@ class EmployeeController extends Controller
     {
         $this->authorize('viewAny', Employee::class);
 
+        // Using Eloquent relationships + eager loading which prevents the N+1 query problem
         $query = Employee::with(['user', 'department', 'position']);
 
         // Show soft-deleted records when trashed=1 is in the request
-        if ($request->boolean('trashed')) {
+        if ($request->boolean('trashed') || $request->status === 'terminated') {
             $query->onlyTrashed();
         }
 

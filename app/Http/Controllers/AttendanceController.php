@@ -31,8 +31,8 @@ class AttendanceController extends Controller
 
     public function myAttendance(): View
     {
-        /** @var User $user */
         $user        = auth()->user();
+        // can use '$user = Auth::user();' with 'use Illuminate\Support\Facades\Auth;' to remove error: 'Undefined method 'user'.'
         $attendances = Attendance::where('employee_id', $user->employee->id)
             ->latest('date')
             ->paginate(20);
@@ -42,7 +42,6 @@ class AttendanceController extends Controller
 
     public function checkIn(Request $request): RedirectResponse
     {
-        /** @var User $user */
         $user     = auth()->user();
         $employee = $user->employee;
 
@@ -73,7 +72,6 @@ class AttendanceController extends Controller
 
     public function checkOut(Request $request): RedirectResponse
     {
-        /** @var User $user */
         $user       = auth()->user();
         $employee   = $user->employee;
 

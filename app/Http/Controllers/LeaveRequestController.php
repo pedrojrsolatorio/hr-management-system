@@ -8,6 +8,7 @@ use App\Notifications\{LeaveRequestNotification, LeaveStatusNotification};
 use Illuminate\Http\{RedirectResponse, Request};
 use Illuminate\View\View;
 use Carbon\Carbon;
+// use Illuminate\Support\Facades\Auth;
 
 class LeaveRequestController extends Controller
 {
@@ -22,8 +23,8 @@ class LeaveRequestController extends Controller
 
     public function myLeaves(): View
     {
-        /** @var \App\Models\User $user */
         $user   = auth()->user();
+        // $user = Auth::user(); // recommended to avoid 'Undefined method 'user'.'
         $leaves = LeaveRequest::where('employee_id', $user->employee->id)
             ->with('leaveType')
             ->latest()
@@ -36,7 +37,6 @@ class LeaveRequestController extends Controller
 
     public function store(StoreLeaveRequest $request): RedirectResponse
     {
-        /** @var \App\Models\User $user */
         $user      = auth()->user();
         $employee  = $user->employee;
         $startDate = Carbon::parse($request->start_date);

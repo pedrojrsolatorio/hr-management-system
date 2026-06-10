@@ -38,7 +38,7 @@
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by name..."
                 class="min-w-48 flex-1 rounded-lg border border-gray-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
             <select name="department"
-                class="rounded-lg border border-gray-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                class="rounded-lg border border-gray-200 px-4 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
                 <option value="">All departments</option>
                 @foreach ($departments as $id => $name)
                     <option value="{{ $id }}" {{ request('department') == $id ? 'selected' : '' }}>
@@ -47,7 +47,7 @@
                 @endforeach
             </select>
             <select name="status"
-                class="rounded-lg border border-gray-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                class="rounded-lg border border-gray-200 px-4 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
                 <option value="">All statuses</option>
                 <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
                 <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>

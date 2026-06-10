@@ -119,8 +119,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['role:employee'])->group(function () {
 
         Route::get('my-profile', [EmployeeController::class, 'profile'])->name('employee.profile');
-        Route::get('my-attendance', [AttendanceController::class, 'myAttendance'])->name('attendance.my');
 
+        Route::get('my-attendance', [AttendanceController::class, 'myAttendance'])->name('attendance.my');
         Route::post('attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.checkin');
         Route::post('attendance/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.checkout');
 

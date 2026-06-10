@@ -19,7 +19,7 @@
 
     <!-- Background -->
     <div class="bg-layer">
-        <div class="bg-grid"></div>
+        {{-- <div class="bg-grid"></div> --}}
         <div class="bg-orb-1"></div>
         <div class="bg-orb-2"></div>
         <div class="bg-orb-3"></div>

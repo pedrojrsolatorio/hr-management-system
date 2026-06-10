@@ -65,7 +65,6 @@ class PayrollController extends Controller
 
     public function myPayslips(): View
     {
-        /** @var \App\Models\User $user */
         $user     = auth()->user();
         $payrolls = Payroll::where('employee_id', $user->employee->id)
             ->latest()

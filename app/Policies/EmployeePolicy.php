@@ -56,7 +56,7 @@ class EmployeePolicy
     {
         // return $user->hasRole('admin') || $user->hasRole('hr_manager');
         // return true; // handled by before()
-        return $user->employee?->id === $employee->id; // Employee can update their own profile only, except admin
+        return $user->employee?->id === $employee->id; // Employee can update their own profile only, as well as admin and hr_manager. but the edit page is only accessible by admin and hr_manager
     }
 
     /**

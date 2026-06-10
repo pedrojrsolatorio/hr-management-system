@@ -165,7 +165,6 @@ class EmployeeController extends Controller
 
     public function profile(): View
     {
-        /** @var \App\Models\User $user */
         $user     = auth()->user();
         $employee = $user->employee;
 

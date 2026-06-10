@@ -78,12 +78,6 @@ class EmployeeService
                 $user->roles()->attach($empRole->id);
             }
 
-            $photoPath = null;
-
-            if (!empty($data['profile_photo']) && is_object($data['profile_photo'])) {
-                $photoPath = $data['profile_photo']->store('employees', 'public'); // or 's3'
-            }
-
             $employee = Employee::create([
                 'user_id'       => $user->id,
                 'department_id' => $data['department_id'] ?? null,
@@ -95,7 +89,7 @@ class EmployeeService
                 'basic_salary'  => $data['basic_salary'],
                 'status'        => $data['status'] ?? 'active',
                 'gender'        => $data['gender'] ?? null,
-                'profile_photo' => $photoPath,
+                'profile_photo' => $data['profile_photo'] ?? null,
                 // 'employee_code' => $this->generateCode(),
                 'employee_code' => Str::uuid(),
             ]);

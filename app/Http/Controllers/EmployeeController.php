@@ -6,6 +6,7 @@ use App\Models\{Employee, Department, Position};
 use App\Services\EmployeeService;
 use App\Http\Requests\{StoreEmployeeRequest, UpdateEmployeeRequest};
 use Illuminate\Http\{RedirectResponse, Request};
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class EmployeeController extends Controller
@@ -65,9 +66,32 @@ class EmployeeController extends Controller
 
     public function store(StoreEmployeeRequest $request): RedirectResponse
     {
-        $this->service->create($request->validated());
+        $data = $request->validated();
+        $photoPath = null;
 
-        return redirect()->route('employees.index')
+        // Handle file upload in controller (HTTP layer)
+        if ($request->hasFile('profile_photo')) {
+            $photoPath = $request->file('profile_photo')
+                ->store('employees', 'public');
+            $data['profile_photo'] = $photoPath;
+        }
+
+        try {
+            $this->service->create($data);
+        } catch (\Throwable $th) {
+            // Clean up the uploaded file if transaction failed
+            if ($photoPath) {
+                Storage::disk('public')->delete($photoPath);
+            }
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Failed to create employee. Please try again.');
+        }
+
+        return redirect()
+            ->route('employees.index')
             ->with('success', 'Employee created successfully.');
     }
 

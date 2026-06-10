@@ -101,9 +101,14 @@ class EmployeeController extends Controller
         // // Employees use the separate profile() method via /my-profile route.
         // $this->authorize('view', $employee);
 
-        $employee->load(['user', 'department', 'position', 'attendance', 'leaveRequests', 'payrolls']);
+        $employee->load(['user', 'department', 'position', 'leaveRequests', 'payrolls']);
 
-        return view('employees.show', compact('employee'));
+        $recentAttendance = $employee->attendance()
+            ->latest()
+            ->limit(10)
+            ->get();
+
+        return view('employees.show', compact('employee', 'recentAttendance'));
     }
 
     public function edit(Employee $employee): View

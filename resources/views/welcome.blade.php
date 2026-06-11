@@ -37,7 +37,11 @@
                 <a href="#features" class="nav-link">Features</a>
                 <a href="#roles" class="nav-link">Roles</a>
                 @auth
-                    <a href="{{ route('dashboard') }}" class="btn-nav">Go to Dashboard →</a>
+                    @if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('hr_manager'))
+                        <a href="{{ route('dashboard') }}" class="btn-nav">Go to Dashboard →</a>
+                    @elseif(auth()->user()->hasRole('employee'))
+                        <a href="{{ route('attendance.my') }}" class="btn-nav">Go to Employee Portal →</a>
+                    @endif
                 @else
                     {{-- <a href="{{ route('login') }}" class="nav-link">Sign in</a> --}}
                     {{-- <a href="{{ route('register') }}" class="btn-nav">Get started →</a> --}}
@@ -66,9 +70,15 @@
 
             <div class="hero-actions">
                 @auth
-                    <a href="{{ route('dashboard') }}" class="btn-primary">
-                        Open Dashboard <span class="btn-arrow">→</span>
-                    </a>
+                    @if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('hr_manager'))
+                        <a href="{{ route('dashboard') }}" class="btn-primary">
+                            Open Dashboard <span class="btn-arrow">→</span>
+                        </a>
+                    @elseif(auth()->user()->hasRole('employee'))
+                        <a href="{{ route('attendance.my') }}" class="btn-primary">
+                            Open Employee Portal <span class="btn-arrow">→</span>
+                        </a>
+                    @endif
                 @else
                     <a href="{{ route('login') }}" class="btn-primary">
                         Sign in <span class="btn-arrow">→</span>

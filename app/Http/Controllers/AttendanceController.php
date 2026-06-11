@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\{RedirectResponse, Request};
 use Illuminate\View\View;
 use Carbon\Carbon;
+// use Illuminate\Support\Facades\Auth;
 
 class AttendanceController extends Controller
 {
@@ -32,7 +33,7 @@ class AttendanceController extends Controller
     public function myAttendance(): View
     {
         $user        = auth()->user();
-        // can use '$user = Auth::user();' with 'use Illuminate\Support\Facades\Auth;' to remove error: 'Undefined method 'user'.'
+        // can use '$user = Auth::user();' to remove 'Undefined method 'user'.' warning
         $attendances = Attendance::where('employee_id', $user->employee->id)
             ->latest('date')
             ->paginate(20);

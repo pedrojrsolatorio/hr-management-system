@@ -24,7 +24,7 @@ class LeaveRequestController extends Controller
     public function myLeaves(): View
     {
         $user   = auth()->user();
-        // $user = Auth::user(); // recommended to avoid 'Undefined method 'user'.'
+        // $user = Auth::user(); // recommended to avoid 'Undefined method 'user'.' warning
         $leaves = LeaveRequest::where('employee_id', $user->employee->id)
             ->with('leaveType')
             ->latest()

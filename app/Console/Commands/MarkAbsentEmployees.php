@@ -37,14 +37,22 @@ class MarkAbsentEmployees extends Command
 
         $today = today()->toDateString();
 
-        // Get all active employees
-        $allEmployeeIds = Employee::where('status', 'active')->pluck('id');
+        // // Get all active employees
+        // $allEmployeeIds = Employee::where('status', 'active')->pluck('id');
 
-        // Get employees who already have a record for today
-        $checkedInIds = Attendance::whereDate('date', $today)->pluck('employee_id');
+        // // Get employees who already have a record for today
+        // $checkedInIds = Attendance::whereDate('date', $today)->pluck('employee_id');
 
-        // The difference = absent employees
-        $absentIds = $allEmployeeIds->diff($checkedInIds);
+        // // The difference = absent employees
+        // $absentIds = $allEmployeeIds->diff($checkedInIds);
+
+        // better single query than the commented 3 lines above
+        $absentIds = Employee::where('status', 'active')
+            ->whereDoesntHave('attendance', function ($q) use ($today) {
+                $q->whereDate('date', $today);
+                // ->whereNotNull('check_in'); // did not include this because it can duplicate record since absent still has no check_in
+            })
+            ->pluck('id');
 
         $count = 0;
         foreach ($absentIds as $employeeId) {

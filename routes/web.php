@@ -70,6 +70,9 @@ Route::middleware('auth')->group(function () {
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::patch('notifications/{id}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
 
+    // to be checked if must be accessible by all roles
+    Route::get('payroll/{payroll}/pdf', [PayrollController::class, 'pdf'])->name('payroll.pdf');
+
     /*
     |-------------------------
     | HR System Routes
@@ -105,7 +108,7 @@ Route::middleware('auth')->group(function () {
     // Admin only
     Route::middleware(['role:admin'])->group(function () {
         Route::post('payroll/generate', [PayrollController::class, 'generate'])->name('payroll.generate');
-        Route::get('payroll/{payroll}/pdf', [PayrollController::class, 'pdf'])->name('payroll.pdf');
+        // Route::get('payroll/{payroll}/pdf', [PayrollController::class, 'pdf'])->name('payroll.pdf');
         Route::resource('payroll', PayrollController::class)->except(['create', 'edit']);
 
         // Employee restore and force delete (admin only)

@@ -98,6 +98,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('leaves/{leave}/reject', [LeaveRequestController::class, 'reject'])->name('leaves.reject');
 
         Route::resource('performance-reviews', PerformanceReviewController::class);
+        Route::get('performance-reviews/{performanceReview}', [PerformanceReviewController::class, 'show'])->name('performance-reviews.show');
 
         Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('reports/employees', [ReportController::class, 'employeeReport'])->name('reports.employees');

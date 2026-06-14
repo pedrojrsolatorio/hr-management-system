@@ -74,7 +74,7 @@ class EmployeePolicy
      */
     public function restore(User $user, Employee $employee): bool
     {
-        return false;
+        return false; // only admin via before()
     }
 
     /**
@@ -82,6 +82,6 @@ class EmployeePolicy
      */
     public function forceDelete(User $user, Employee $employee): bool
     {
-        return false;
+        return false; // only admin via before()
     }
 }

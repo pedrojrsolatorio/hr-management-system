@@ -142,7 +142,7 @@ class EmployeeController extends Controller
     // Restore a soft-deleted employee.
     public function restore(int $id): RedirectResponse
     {
-        $this->authorize('delete', Employee::class);
+        $this->authorize('restore', Employee::class);
 
         $this->service->restore($id);
 

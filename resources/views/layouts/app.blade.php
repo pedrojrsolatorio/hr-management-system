@@ -146,7 +146,7 @@
         <div class="flex flex-1 flex-col overflow-hidden">
             <header class="border-b border-gray-100 bg-white px-8 py-4">
                 <div class="flex items-center justify-between">
-                    <div>{{ $header ?? '' }}</div>
+                    <div class="flex-1">{{ $header ?? '' }}</div>
 
                     {{-- Notification Icon --}}
                     <div class="relative">

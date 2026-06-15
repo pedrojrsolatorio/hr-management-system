@@ -4,7 +4,7 @@
     @endphp
 
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+        <div class="flex w-full items-center justify-between pr-12">
             <h2 class="text-xl font-semibold text-gray-800">Employees</h2>
             <div class="flex gap-2">
                 {{-- Note: putting 'status' => 'terminated' here looks redundant --}}

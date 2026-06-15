@@ -22,13 +22,13 @@
 
 <body class="bg-gray-50 font-sans text-gray-900 antialiased">
 
-    <div x-data="{ open: localStorage.getItem('sidebar') !== 'hidden' }" x-init="$watch('open', value => localStorage.setItem('sidebar', value ? 'shown' : 'hidden'))" class="flex min-h-screen">
+    <div x-data="{ open: localStorage.getItem('sidebar') !== 'hidden' }" x-init="$watch('open', value => localStorage.setItem('sidebar', value ? 'shown' : 'hidden'))" class="flex h-screen">
 
         {{-- @include('layouts.navigation') --}}
 
         {{-- Sidebar --}}
         <aside :class="open ? 'w-64' : 'w-20'"
-            class="flex flex-col border-r border-gray-100 bg-white transition-all duration-300 ease-in-out">
+            class="flex flex-col overflow-y-auto border-r border-gray-100 bg-white transition-all duration-300 ease-in-out">
 
             <div class="flex items-center justify-between border-b border-gray-100 px-4 py-5">
                 <span class="text-lg font-bold text-indigo-600" x-show="open" x-cloak>
@@ -143,7 +143,7 @@
         </aside>
 
         {{-- Main content --}}
-        <div class="flex flex-1 flex-col">
+        <div class="flex flex-1 flex-col overflow-hidden">
             <header class="border-b border-gray-100 bg-white px-8 py-4">
                 <div class="flex items-center justify-between">
                     <div>{{ $header ?? '' }}</div>

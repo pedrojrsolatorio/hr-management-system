@@ -43,7 +43,11 @@
                     @forelse($attendances as $record)
                         <tr class="hover:bg-gray-50">
                             <td class="px-6 py-3 font-medium text-gray-800">
-                                {{ $record->employee->user->name }}
+                                @if ($record->employee?->user)
+                                    {{ $record->employee->user->name }}
+                                @else
+                                    <span class="italic text-gray-400">Deleted User</span>
+                                @endif
                             </td>
                             <td class="px-6 py-3 text-gray-600">
                                 {{ $record->date->format('M d, Y') }}

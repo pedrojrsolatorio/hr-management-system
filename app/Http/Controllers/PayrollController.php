@@ -58,8 +58,10 @@ class PayrollController extends Controller
 
         $pdf = Pdf::loadView('payroll.pdf', compact('payroll'));
 
+        $employeeCode = $payroll->employee?->employee_code ?? 'unknown';
+
         return $pdf->stream(
-            "payslip-{$payroll->employee->employee_code}-{$payroll->month}.pdf"
+            "payslip-{$employeeCode}-{$payroll->month}.pdf"
         );
     }
 

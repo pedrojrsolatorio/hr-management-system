@@ -153,7 +153,7 @@ class EmployeeController extends Controller
     // Permanently delete a soft-deleted employee.
     public function forceDestroy(int $id): RedirectResponse
     {
-        $this->authorize('delete', Employee::class);
+        $this->authorize('forceDelete', Employee::class);
 
         $employee = Employee::withTrashed()->findOrFail($id);
 

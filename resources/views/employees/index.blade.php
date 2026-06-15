@@ -20,7 +20,7 @@
         </div>
     </x-slot>
 
-    <div class="mx-auto max-w-7xl px-6 py-8">
+    <div x-data="{ open: false, name: '', action: '' }" class="mx-auto max-w-7xl px-6 py-8">
 
         @if (session('success'))
             <div class="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-700">
@@ -139,7 +139,7 @@
 
                                         {{-- Force delete button --}}
                                         <button type="button"
-                                            onclick="openForceDeleteModal({{ $employee->id }}, '{{ addslashes($employee->user->name) }}')"
+                                            @click="open = true; name = @js($employee->user->name); action = '{{ route('employees.force-destroy', $employee->id) }}';"
                                             class="text-xs font-medium text-red-600 hover:underline">
                                             Delete Permanently
                                         </button>
@@ -171,53 +171,34 @@
         </div>
 
         <div class="mt-4">{{ $employees->links() }}</div>
-    </div>
 
-    {{-- Force Delete Confirmation Modal --}}
-    <div id="force-delete-modal" class="fixed inset-0 z-50 flex hidden items-center justify-center"
-        style="background: rgba(0,0,0,0.45);">
-        <div class="mx-4 w-full max-w-md rounded-xl border border-gray-100 bg-white p-6">
-            <h3 class="mb-2 text-base font-semibold text-gray-800">Permanently delete employee?</h3>
-            <p class="mb-1 text-sm text-gray-500">
-                You are about to permanently delete
-                <span id="modal-employee-name" class="font-medium text-gray-800"></span>.
-            </p>
-            <p class="mb-6 text-sm text-red-600">
-                This cannot be undone. Their login credentials will be erased.
-                Payroll, attendance, and leave records will be kept but anonymised.
-            </p>
-            <div class="flex justify-end gap-3">
-                <button type="button" onclick="closeForceDeleteModal()"
-                    class="rounded-lg border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50">
-                    Cancel
-                </button>
-                <form id="force-delete-form" method="POST">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700">
-                        Yes, delete permanently
+        {{-- Force Delete Confirmation Modal --}}
+        <div x-show="open" x-cloak class="fixed inset-0 z-50 flex items-center justify-center"
+            style="background: rgba(0,0,0,0.45);">
+            <div class="mx-4 w-full max-w-md rounded-xl border border-gray-100 bg-white p-6">
+                <h3 class="mb-2 text-base font-semibold text-gray-800">Permanently delete employee?</h3>
+                <p class="mb-1 text-sm text-gray-500">
+                    You are about to permanently delete
+                    <span x-text="name" class="font-medium text-gray-800"></span>.
+                </p>
+                <p class="mb-6 text-sm text-red-600">
+                    This cannot be undone. Their login credentials will be erased.
+                    Payroll, attendance, and leave records will be kept but anonymised.
+                </p>
+                <div class="flex justify-end gap-3">
+                    <button type="button" @click="open = false"
+                        class="rounded-lg border border-gray-200 px-4 py-2 text-sm hover:bg-gray-50">
+                        Cancel
                     </button>
-                </form>
+                    <form :action="action" method="POST">
+                        @csrf @method('DELETE')
+                        <button type="submit"
+                            class="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700">
+                            Yes, delete permanently
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-
-    @push('scripts')
-        <script>
-            function openForceDeleteModal(id, name) {
-                document.getElementById('modal-employee-name').textContent = name;
-                document.getElementById('force-delete-form').action =
-                    '/employees/' + id + '/force';
-                document.getElementById('force-delete-modal').classList.remove('hidden');
-            }
-
-            function closeForceDeleteModal() {
-                document.getElementById('force-delete-modal').classList.add('hidden');
-            }
-
-            // Close modal on backdrop click
-            document.getElementById('force-delete-modal').addEventListener('click', function(e) {
-                if (e.target === this) closeForceDeleteModal();
-            });
-        </script>
-    @endpush
 </x-app-layout>

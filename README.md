@@ -1,6 +1,6 @@
 # HRMS — Human Resource Management System
 
-A full-featured Human Resource Management System built with Laravel 11, Blade, TailwindCSS, and MySQL. Designed for real-world internal use with role-based access control, payroll generation, attendance tracking, leave management, and more.
+A full-featured Human Resource Management System built with Laravel 11, Blade, TailwindCSS, and MySQL. Designed for real-world internal use with role-based access control, payroll generation, attendance tracking, leave management, performance reviews, and a built-in rule-based HR chatbot.
 
 ---
 
@@ -13,10 +13,10 @@ A full-featured Human Resource Management System built with Laravel 11, Blade, T
 - [Default credentials](#default-credentials)
 - [Roles and permissions](#roles-and-permissions)
 - [Module overview](#module-overview)
+- [HR Chatbot](#hr-chatbot)
 - [Project structure](#project-structure)
 - [API endpoints](#api-endpoints)
 - [Configuration](#configuration)
-- [Screenshots](#screenshots)
 - [Future improvements](#future-improvements)
 
 ---
@@ -28,12 +28,13 @@ A full-featured Human Resource Management System built with Laravel 11, Blade, T
 - **Leave management** — configurable leave types, balance tracking, approval workflow with HR notifications, and leave history per employee
 - **Payroll system** — automated salary calculation with allowances, deductions, and absence adjustments; one-click PDF payslip generation; bulk payroll generation for all active employees
 - **Performance reviews** — scored evaluations by period with strengths, improvement areas, and comments; full review history per employee
+- **Rule-based HR chatbot** — no AI, no external services; pure PHP pattern matching with role-aware responses for Admin, HR Manager, and Employee
 - **Role-based access control** — three roles (Admin, HR Manager, Employee) with middleware and policy-based authorization
 - **Analytics dashboard** — real-time stats cards and Chart.js charts for attendance trends, department distribution, and monthly payroll costs
 - **Reports and exports** — employee, payroll, and attendance reports exportable as PDF (DomPDF) or Excel (Maatwebsite)
-- **REST API** — Sanctum-authenticated JSON API for all core resources
 - **Notifications** — database notifications for leave submissions, approvals, rejections, and performance reviews
 - **Audit logging** — every create and update action on employee records is logged with old and new values and the acting user's IP address
+- **Soft deletes** — employees, users, departments, positions, and payrolls are soft-deleted; permanent deletion anonymises historical records rather than wiping them
 
 ---
 
@@ -71,8 +72,8 @@ PHP extensions required: `pdo_mysql`, `mbstring`, `openssl`, `tokenizer`, `xml`,
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/laravel-hr-management-system.git
-cd laravel-hr-management-system
+git clone https://github.com/pedrojrsolatorio/hr-management-system.git
+cd hr-management-system
 ```
 
 ### 2. Install PHP dependencies
@@ -101,7 +102,7 @@ Open `.env` and update the following values:
 
 ```env
 APP_NAME="HR Management System"
-APP_URL=http://localhost/laravel-hr-management-system/public
+APP_URL=http://localhost/hr-management-system/public
 
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -135,7 +136,21 @@ php artisan db:seed
 php artisan storage:link
 ```
 
-### 10. Start the development server
+### 10. Set up the scheduler (for automatic absent marking)
+
+Add this to your server crontab:
+
+```bash
+* * * * * cd /path/to/hr-management-system && php artisan schedule:run >> /dev/null 2>&1
+```
+
+For local development, run the scheduler manually:
+
+```bash
+php artisan schedule:work
+```
+
+### 11. Start the development server
 
 ```bash
 php artisan serve
@@ -151,8 +166,7 @@ Visit `http://localhost:8000` in your browser.
 | ---------- | -------------- | -------- |
 | Admin      | admin@hrms.com | password |
 | HR Manager | hr@hrms.com    | password |
-| Employee   | emp1@hrms.com  | password |
-| Employee   | emp2@hrms.com  | password |
+| Employee   | check database | password |
 
 > **Note:** Change all passwords immediately before deploying to production.
 
@@ -167,7 +181,7 @@ Visit `http://localhost:8000` in your browser.
 - Generate, approve, and mark payroll as paid
 - Permanently delete terminated employees
 - View all reports and audit logs
-- Access REST API
+- Chatbot shows system-wide stats: headcount, attendance, payroll cost, pending leaves
 
 ### HR Manager
 
@@ -176,6 +190,7 @@ Visit `http://localhost:8000` in your browser.
 - Approve or reject leave requests
 - Submit performance reviews
 - Export reports as PDF or Excel
+- Chatbot shows team-level data: pending approvals, who is on leave today, department headcount
 
 ### Employee
 
@@ -184,7 +199,8 @@ Visit `http://localhost:8000` in your browser.
 - Submit leave requests and view balance
 - Download own PDF payslips
 - View own attendance history
-- Receive in-app notifications
+- Receive in-app notifications for leave decisions and performance reviews
+- Chatbot shows personal data only: own leave balance, attendance, payslips, HR FAQs
 
 ---
 
@@ -196,7 +212,7 @@ Real-time metrics showing total active employees, present today, on leave today,
 
 ### Employee management
 
-Full CRUD with profile photo upload, department and position assignment, hire date, salary, gender, and contact details. Soft-delete termination preserves all historical records. Admin can restore or permanently delete terminated employees.
+Full CRUD with profile photo upload, department and position assignment, hire date, salary, gender, and contact details. Soft-delete termination preserves all historical records. Admin can restore or permanently delete terminated employees. Permanent deletion nullifies foreign keys on payroll and attendance records rather than cascading deletes, preserving financial history.
 
 ### Department management
 
@@ -208,7 +224,7 @@ Create positions with level classification (junior, mid, senior, lead, manager, 
 
 ### Attendance tracking
 
-Employees check in and check out via the web interface. The system detects late arrivals (after 09:00). HR managers view all records filterable by employee and date. Monthly report shows present, late, and absent counts per employee.
+Employees check in and check out via the web interface. The system detects late arrivals (after 09:00) on check-in and half-days (check-out before 13:00) on check-out. A scheduled artisan command (`attendance:mark-absent`) runs at 18:00 on weekdays and creates absent records for employees who never checked in. HR managers view all records filterable by employee and date. Monthly report shows present, late, half-day, and absent counts per employee.
 
 ### Leave management
 
@@ -232,21 +248,72 @@ All in-app notifications use Laravel's database channel. HR managers are notifie
 
 ---
 
+## HR Chatbot
+
+A built-in rule-based chatbot accessible from the sidebar under **HR Assistant**. No AI API, no external services, no paid subscriptions. Pure PHP string matching with word-boundary regex.
+
+### How it works
+
+1. User types a message or clicks a quick-reply button
+2. The input is lowercased and checked against a prioritised intent list using `preg_match` with word-boundary patterns
+3. The matched intent fires a handler that queries the database scoped to the authenticated user
+4. The response is returned as JSON containing text, optional info cards, and optional quick-reply buttons
+5. The Blade view renders everything inline without a page reload
+
+### Role-aware responses
+
+| Role           | What the chatbot can answer                                                                                                                                                                                                                                                                                                  |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Admin**      | System overview, total headcount, company-wide attendance today and this month, pending leave queue, payroll status with draft/approved/paid breakdown, department headcount, recent performance reviews, all HR FAQs                                                                                                        |
+| **HR Manager** | HR overview (present today, on leave today, pending approvals), all employees count, company attendance, pending leave queue, leave summary with who is on leave today, department stats, performance reviews, all HR FAQs                                                                                                   |
+| **Employee**   | Own leave balance per type, own leave history, own attendance today, own monthly attendance summary, latest payslip breakdown, payroll history (last 6), own profile details, HR FAQs (leave policy, payroll schedule, working hours, late policy, absent policy, how to request leave, how to download payslip, contact HR) |
+
+### Sample questions
+
+```
+"leave balance"            → shows remaining days per leave type
+"attendance today"         → shows today's check-in, check-out, status
+"attendance this month"    → shows present/late/half-day/absent counts
+"my payslip"               → shows latest payroll breakdown
+"payroll schedule"         → explains when and how salary is calculated
+"pending leaves"           → (admin/HR) lists all pending approvals
+"overview"                 → (admin/HR) shows system-wide summary cards
+"department stats"         → headcount per department
+"working hours"            → office hours and late threshold
+"contact hr"               → lists HR manager names and emails
+"help"                     → shows all available topics as buttons
+```
+
+### Extending the chatbot
+
+To add a new intent, add one entry to `employeeIntents()`, `adminIntents()`, `hrManagerIntents()`, or `sharedIntents()` in `app/Services/ChatbotService.php`:
+
+```php
+[
+    'name'     => 'my_new_intent',
+    'patterns' => ['keyword one', 'keyword two', 'phrase three'],
+    'handler'  => fn($i) => $this->handleMyNewIntent(),
+],
+```
+
+Then add the corresponding handler method. Place more specific patterns before generic ones in the array — the matcher returns the first match found.
+
+---
+
 ## Project structure
 
 ```
 app/
+├── Console/
+│   └── Commands/
+│       └── MarkAbsentEmployees.php
 ├── Exports/
 │   ├── EmployeesExport.php
 │   └── PayrollExport.php
 ├── Http/
 │   ├── Controllers/
-│   │   ├── Api/
-│   │   │   ├── AttendanceController.php
-│   │   │   ├── EmployeeController.php
-│   │   │   ├── LeaveRequestController.php
-│   │   │   └── PayrollController.php
 │   │   ├── AttendanceController.php
+│   │   ├── ChatbotController.php
 │   │   ├── DashboardController.php
 │   │   ├── DepartmentController.php
 │   │   ├── EmployeeController.php
@@ -287,6 +354,7 @@ app/
 ├── Providers/
 │   └── AppServiceProvider.php
 └── Services/
+    ├── ChatbotService.php
     ├── EmployeeService.php
     └── PayrollService.php
 
@@ -304,6 +372,7 @@ database/
 
 resources/views/
 ├── attendance/
+├── chatbot/
 ├── dashboard.blade.php
 ├── departments/
 ├── employees/
@@ -317,41 +386,8 @@ resources/views/
 └── reports/
 
 routes/
-├── api.php
 ├── auth.php
 └── web.php
-```
-
----
-
-## API endpoints
-
-All API endpoints require a Sanctum bearer token. Obtain a token via the standard Sanctum token endpoint.
-
-```
-GET    /api/employees          List employees (paginated)
-POST   /api/employees          Create employee
-GET    /api/employees/{id}     Get employee detail
-PUT    /api/employees/{id}     Update employee
-DELETE /api/employees/{id}     Delete employee
-
-GET    /api/attendance         List attendance records
-POST   /api/attendance         Check in or check out (action: check_in | check_out)
-GET    /api/attendance/{id}    Get single record
-PUT    /api/attendance/{id}    Update record
-DELETE /api/attendance/{id}    Delete record
-
-GET    /api/leaves             List leave requests
-POST   /api/leaves             Submit leave request
-GET    /api/leaves/{id}        Get leave detail
-PUT    /api/leaves/{id}        Approve or reject (status: approved | rejected)
-DELETE /api/leaves/{id}        Cancel pending request
-
-GET    /api/payroll            List payroll records
-POST   /api/payroll            Generate payroll for an employee
-GET    /api/payroll/{id}       Get payroll detail with items
-PUT    /api/payroll/{id}       Update payroll status (draft | approved | paid)
-DELETE /api/payroll/{id}       Delete draft payroll
 ```
 
 ---
@@ -364,6 +400,22 @@ The default late check-in threshold is 09:00. To change it, open `app/Http/Contr
 
 ```php
 $lateThreshold = Carbon::today()->setTime(9, 0); // change 9 to your preferred hour
+```
+
+### Changing the half-day threshold
+
+Default is 13:00 (checked out before 1 PM). Same file, `checkOut` method:
+
+```php
+$halfDayThreshold = Carbon::today()->setTime(13, 0); // change 13 to your preferred hour
+```
+
+### Changing the absent marking time
+
+Default is 18:00 (6 PM). Open `routes/console.php`:
+
+```php
+Schedule::command('attendance:mark-absent')->weekdays()->dailyAt('18:00');
 ```
 
 ### Changing payroll allowance and deduction rates
@@ -398,6 +450,30 @@ MAIL_FROM_NAME="HR Management System"
 
 Then add `'mail'` to the `via()` array in each notification class.
 
+### IDE helper (removes false warnings in VS Code / PhpStorm)
+
+```bash
+composer require --dev barryvdh/laravel-ide-helper
+php artisan ide-helper:generate
+php artisan ide-helper:models --nowrite
+php artisan ide-helper:eloquent
+```
+
+---
+
+## Artisan commands
+
+| Command                                       | Description                                                       |
+| --------------------------------------------- | ----------------------------------------------------------------- |
+| `php artisan migrate`                         | Run all database migrations                                       |
+| `php artisan db:seed`                         | Seed sample roles, departments, positions, leave types, and users |
+| `php artisan db:seed --class=HrManagerSeeder` | Seed only the HR Manager account                                  |
+| `php artisan attendance:mark-absent`          | Manually mark absent employees for today                          |
+| `php artisan schedule:work`                   | Run the task scheduler locally (development)                      |
+| `php artisan storage:link`                    | Create the public storage symlink for profile photos              |
+| `php artisan optimize:clear`                  | Clear all caches (run after any config or route changes)          |
+| `php artisan route:list`                      | List all registered routes                                        |
+
 ---
 
 ## Future improvements
@@ -406,11 +482,12 @@ Then add `'mail'` to the `via()` array in each notification class.
 - **Training and LMS** — course catalogue, enrollment, progress tracking, and completion certificates
 - **Employee self-service portal** — document uploads, emergency contact management, bank account updates
 - **Biometric integration** — REST webhooks from ZKTeco or similar devices to auto-populate attendance records
-- **Mobile app** — Flutter or React Native front-end consuming the existing Sanctum API
+- **Mobile app** — Flutter or React Native front-end; the system architecture already supports this with clean service classes
 - **Shift and overtime management** — shift schedules, rotating patterns, and overtime calculation fed into payroll
 - **Document management** — contract versioning, digital signatures, and automated renewal reminders
 - **Multi-company support** — tenant isolation for managing multiple companies from a single installation
 - **Two-factor authentication** — TOTP-based 2FA for admin and HR manager accounts
+- **Chatbot enhancements** — natural language pre-processing, synonym expansion, and conversation memory within a session
 
 ---
 

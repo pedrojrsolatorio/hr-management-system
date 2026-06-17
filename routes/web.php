@@ -6,6 +6,7 @@ use App\Http\Controllers\{
     EmployeeController,
     DepartmentController,
     AttendanceController,
+    ChatbotController,
     LeaveRequestController,
     PayrollController,
     PerformanceReviewController,
@@ -72,6 +73,9 @@ Route::middleware('auth')->group(function () {
 
     // to be checked if must be accessible by all roles
     Route::get('payroll/{payroll}/pdf', [PayrollController::class, 'pdf'])->name('payroll.pdf');
+
+    Route::get('chatbot', [ChatbotController::class, 'index'])->name('chatbot.index');
+    Route::post('chatbot/message', [ChatbotController::class, 'message'])->name('chatbot.message');
 
     /*
     |-------------------------

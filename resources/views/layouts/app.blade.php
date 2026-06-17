@@ -130,6 +130,12 @@
                         <span x-show="open" x-cloak>My Profile</span>
                     </a>
                 @endif
+
+                <a href="{{ route('chatbot.index') }}"
+                    class="{{ request()->routeIs('chatbot.*') ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600' }} flex items-center gap-2 rounded-lg px-3 py-2 hover:bg-indigo-50 hover:text-indigo-700">
+                    <span>💬</span>
+                    <span x-show="open" x-cloak>HR Assitant</span>
+                </a>
             </nav>
 
             {{-- User info + logout --}}
